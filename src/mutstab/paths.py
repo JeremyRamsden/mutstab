@@ -43,8 +43,15 @@ COLAB_SCRATCH = Path("/content/mutstab-local")
 
 
 def in_colab() -> bool:
-    """True when running inside Google Colab."""
-    return importlib.util.find_spec("google.colab") is not None
+    """True when running inside Google Colab.
+
+    find_spec raises rather than returning None when the parent package is
+    absent, which is the normal case off Colab — hence the except.
+    """
+    try:
+        return importlib.util.find_spec("google.colab") is not None
+    except (ImportError, AttributeError, ValueError):
+        return False
 
 
 def repo_root() -> Path:

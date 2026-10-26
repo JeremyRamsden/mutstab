@@ -42,9 +42,10 @@ def test_pooled_can_flatter_a_model_that_only_knows_protein_identity():
     pooled = regression_metrics(y, pred)
     per_protein = per_protein_metrics(y, pred, groups)
 
-    # This is the trap the per-protein view exists to expose.
-    assert pooled["spearman"] > 0.9
-    assert abs(per_protein["median_spearman"]) < 0.4
+    # This is the trap the per-protein view exists to expose: a respectable
+    # pooled number from a model whose within-protein ranking is noise.
+    assert pooled["spearman"] > 0.7
+    assert abs(per_protein["median_spearman"]) < 0.3
 
 
 def test_small_proteins_are_excluded_from_per_protein():

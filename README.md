@@ -101,9 +101,10 @@ cluster at 30% identity (mmseqs2) and pass the cluster ids as `groups`.
 **Per-protein metrics are the honest ones.** A pooled correlation rewards
 ranking proteins against each other, which is easy and useless. What matters
 is ranking mutations within a protein. `eval/metrics.py` reports both, plus the
-constant baseline; `test_eval_and_model.py` has a case where pooled Spearman
-exceeds 0.9 while the median per-protein Spearman is near zero. If your two
-numbers diverge like that, the model has learned protein identity.
+constant baseline; `test_eval_and_model.py` has a case where pooled Spearman is
+0.74 while the median per-protein Spearman is -0.04 — same predictions, same
+data. If your two numbers diverge like that, the model has learned protein
+identity.
 
 **dTm is not ddG.** They correlate but are not convertible — the relation
 involves the unfolding enthalpy, which is usually unreported. The two stay in
