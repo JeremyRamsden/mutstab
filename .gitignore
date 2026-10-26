@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+.DS_Store
+.env
+
+# Data never goes in git. It lives in Drive (see src/mutstab/paths.py).
+# Leading slash matters: a bare `data/` would also ignore src/mutstab/data/.
+/data/
+*.csv
+*.parquet
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.pt
+*.ckpt
+
+# Committed exceptions: these are small and ARE part of the record.
+!results/**/*.json
+!splits/**/*.json
+!configs/**/*.yaml

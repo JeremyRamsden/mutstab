@@ -1,0 +1,14 @@
+# The cheap control: no embeddings, residue properties only.
+#
+# Run this before anything else. It needs no GPU and no embedding store, and
+# it tells you what the trivial feature set achieves. Several published dTm
+# predictors do not clearly beat a model like this once you split by protein.
+#
+# `extends` means this file says only what differs from the baseline, so the
+# two configs cannot drift apart.
+
+extends: baseline
+name: properties-only
+
+features:
+  use_embeddings: false

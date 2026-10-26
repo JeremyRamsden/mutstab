@@ -1,0 +1,41 @@
+# Baseline: ridge over residue properties + ESM-2 embedding at the mutated
+# position, scored with protein-level 5-fold CV.
+#
+# Every value here is hashed into the run id, so a change to any of it
+# produces a new results file rather than overwriting the old one.
+
+name: baseline-ridge
+
+data:
+  # Relative to paths.raw_dir() — i.e. Drive in Colab, ./data locally.
+  raw_file: fireprotdb_export.csv
+  processed_file: dtm_v1.parquet
+  target: dtm
+  filters:
+    ph_range: [5.0, 9.0]
+    abs_dtm_max: 30.0
+    drop_duplicates: median
+  # Synthetic reverse mutations, training side only. See data/load.py.
+  add_reverse: true
+
+split:
+  file: protein_5fold_v1
+  n_folds: 5
+  holdout_frac: 0.15
+  seed: 0
+
+features:
+  use_embeddings: true
+  include_mean_embedding: false
+  embedding_store: esm2_650m.h5   # relative to paths.cache_dir()
+  extra_columns: []               # e.g. [rsa, conservation] once you have them
+
+model:
+  kind: ridge
+  alpha: 10.0
+
+eval:
+  # Degrees C above which a mutation counts as stabilising for the AUC.
+  stabilising_threshold: 1.0
+  # Proteins with fewer measurements are skipped in per-protein metrics.
+  min_per_group: 5
