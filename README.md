@@ -35,7 +35,7 @@ change.
 from google.colab import drive
 drive.mount('/content/drive')
 
-!git clone https://github.com/<you>/mutstab.git /content/mutstab
+!git clone https://github.com/JeremyRamsden/mutstab.git /content/mutstab
 %pip install -qe /content/mutstab
 
 from mutstab import paths
