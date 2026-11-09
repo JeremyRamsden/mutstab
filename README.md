@@ -1,5 +1,7 @@
 # mutstab
 
+[![tests](https://github.com/JeremyRamsden/mutstab/actions/workflows/tests.yml/badge.svg)](https://github.com/JeremyRamsden/mutstab/actions/workflows/tests.yml)
+
 Predicting the effect of point mutations on protein melting temperature (Tm).
 
 The structure here is built around three constraints: code in git, data in
