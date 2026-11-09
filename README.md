@@ -13,12 +13,13 @@ src/mutstab/        the real code — installed as a package
   paths.py          where data lives; the Colab/local switch
   config.py         YAML configs, hashed for traceability
   runs.py           one JSON per run: config + git SHA + metrics
-  data/             loading, filtering, split definitions
+  data/             loading, filtering, sequences, split definitions
   features/         embedding cache, per-variant feature vectors
   models/           models and the cross-validation loop
   eval/             metrics, including the per-protein view
 configs/            one YAML per experiment
-scripts/            prepare_data -> make_splits -> embed -> train
+scripts/            prepare_data -> fetch_sequences -> make_splits
+                      -> embed -> train
 notebooks/          thin drivers that import from src/
 splits/             split definitions, committed
 results/            run records, committed
@@ -46,12 +47,16 @@ print(paths.describe())
 Then run the pipeline in order:
 
 ```bash
-python scripts/prepare_data.py --config baseline    # raw export -> parquet
-python scripts/make_splits.py  --config baseline    # protein-level folds, once
-python scripts/train.py --config properties_only    # no GPU needed
-python scripts/embed.py --config baseline           # GPU; resumable
+python scripts/prepare_data.py    --config baseline  # raw export -> parquet
+python scripts/fetch_sequences.py --config baseline  # UniProt + position check
+python scripts/make_splits.py     --config baseline  # protein-level folds, once
+python scripts/train.py --config properties_only     # no GPU needed
+python scripts/embed.py --config baseline            # GPU; resumable
 python scripts/train.py --config baseline
 ```
+
+Run `fetch_sequences.py` before `make_splits.py`: it can drop proteins whose
+numbering cannot be reconciled, and a split file built before that is stale.
 
 Locally, point `MUTSTAB_DATA_ROOT` at a folder and the same commands work:
 
@@ -88,7 +93,7 @@ once and returns the local path; read from that in the training loop and write
 checkpoints back to Drive. Off Colab it is a no-op, so the same code runs
 either way.
 
-## Three things this project tries not to get wrong
+## Four things this project tries not to get wrong
 
 **Splits are an artifact, not a function call.** `splits/*.json` is generated
 once by `make_splits.py`, committed, and reused. No protein appears in two
@@ -118,6 +123,16 @@ convention here is mutant minus wild type, so positive means stabilising.
 Spot-check some entries against their original papers before trusting a model
 trained on them — a flipped subset is the easiest way to get a quietly broken
 model.
+
+**Positions mean nothing without the sequence they index.** A record saying
+"position 42, wild type alanine" is numbered according to its source paper,
+which may follow the PDB file, the mature protein after signal-peptide
+cleavage, or a tagged construct — each differing from UniProt by a constant,
+sometimes by tens of residues. Nothing errors; the embedding is simply read
+from the wrong residue. So `fetch_sequences.py` checks every variant against
+the fetched sequence, finds a constant offset where one explains the
+disagreement, and drops proteins where none does. It writes
+`results/position_check.csv` recording what it changed — commit that file.
 
 ## Reproducibility, minimally
 
